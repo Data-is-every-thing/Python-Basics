@@ -1,0 +1,63 @@
+from pprint import pprint
+
+def empty(puzzle):
+    
+    for r in range(9): # R stands for row
+        for c in range(9): # c stands for coulmn
+            if puzzle[r][c] == -1: # -1 - empty cell
+                return r, c # Position of row and coulmn of empty cell
+            
+    return None, None # if no spaces left in the puzzle
+
+def valid(puzzle,guess,row,col):# checks whether guess at given position is valid or not
+    
+    rowValues = puzzle[row] # All values of the row in which one or more cells are empty
+    colValues = [puzzle[i][col] for i in range(9)]
+    
+    if (guess in rowValues) or (guess in colValues):
+        return False # According to sudoku rules
+    
+    rowStart = (row//3) * 3 ; rowEnd = rowStart+3 # only int div 
+    colStart = (col//3) * 3 ; colEnd = colStart+3 
+    
+    for r in range(rowStart,rowEnd): # For 3x3 checks
+        for c in range(colStart,colEnd):
+            if puzzle[row][col] == guess:
+                return False
+            
+    return True # will only reach if passed through all the checks
+
+def solve_sudoku(puzzle): # Backtracking technique
+    
+    row,col = empty(puzzle)
+    
+    if row is None:
+        return True # Puzzle solved coz no place is left empty
+    
+    for guess in range(1,10):
+        if valid(puzzle,guess,row,col): # if True 
+            puzzle[row][col] = guess # Assigning our guess
+            
+            if solve_sudoku(puzzle):
+                return True
+            
+        puzzle[row][col] = -1 # recurssion - if guess checks are false then making the cell empty
+        
+    return False
+    
+example = [ # sudoku to solve
+            [7, 8, -1, 4, -1, -1, 1, 2, -1],
+            [6, -1, -1, -1, 7, 5, -1, -1, 9],
+            [-1, -1, -1, 6, -1, 1, -1, 7, 8],
+            [-1, -1, 7, -1, 4, -1, 2, 6, -1],
+            [-1, -1, 1, -1, 5, -1, 9, 3, -1],
+            [9, -1, 4, -1, 6, -1, -1, -1, 5],
+            [-1, 7, -1, 3, -1, -1, -1, 1, 2],
+            [1, 2, -1, -1, -1, 7, 4, -1, -1],
+            [-1, 4, 9, 2, -1, 6, -1, -1, 7]
+        ]
+
+if (solve_sudoku(example)):
+    print('\n') ; pprint(example) ; print('\n') # new functions - pprint
+else:
+    print('\nThis sudoku cannot be solved\n')
